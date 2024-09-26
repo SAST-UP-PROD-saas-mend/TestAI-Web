@@ -22,6 +22,7 @@
 
 package org.owasp.webgoat.lessons.sqlinjection.introduction;
 
+import java.sql.PreparedStatement;
 import jakarta.annotation.PostConstruct;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -75,9 +76,9 @@ public class SqlInjectionLesson5 extends AssignmentEndpoint {
   protected AttackResult injectableQuery(String query) {
     try (Connection connection = dataSource.getConnection()) {
       try (Statement statement =
-          connection.createStatement(
-              ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
-        statement.executeQuery(query);
+        String sql = query;
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+          preparedStatement.executeQuery();
         if (checkSolution(connection)) {
           return success(this).build();
         }
